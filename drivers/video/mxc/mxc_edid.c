@@ -218,9 +218,9 @@ int mxc_edid_fb_mode_is_equal(bool use_aspect,
 	u32 mask;
 
 	if (use_aspect)
-		mask = ~0;
+		mask = ~FB_VMODE_FRACTIONAL;
 	else
-		mask = ~FB_VMODE_ASPECT_MASK;
+		mask = ~(FB_VMODE_FRACTIONAL | FB_VMODE_ASPECT_MASK);
 
 	return (mode1->xres         == mode2->xres &&
 		mode1->yres         == mode2->yres &&
@@ -823,7 +823,12 @@ const struct fb_videomode *mxc_fb_find_nearest_mode(const struct fb_videomode *m
 	struct fb_videomode *cmode;
 	static struct fb_videomode *best;
 	static u32 diff, diff_refresh;
-	u32 mask = relax ? FB_VMODE_MASK_SIMPLE | FB_VMODE_ASPECT_MASK : ~0;
+	u32 mask = relax ? ~FB_VMODE_ASPECT_MASK : ~0;
+	int refresh = mode->refresh;
+
+	if ((mode->flag & FB_MODE_IS_FROM_VAR) &&
+	    (mode->vmode & FB_VMODE_FRACTIONAL))
+		refresh--;
 
 	if (!relax) {
 		diff = -1;
@@ -844,10 +849,10 @@ const struct fb_videomode *mxc_fb_find_nearest_mode(const struct fb_videomode *m
 			abs(cmode->yres - mode->yres);
 		if (diff > d) {
 			diff = d;
-			diff_refresh = abs(cmode->refresh - mode->refresh);
+			diff_refresh = abs(cmode->refresh - refresh);
 			best = cmode;
 		} else if (diff == d) {
-			d = abs(cmode->refresh - mode->refresh);
+			d = abs(cmode->refresh - refresh);
 			if (diff_refresh > d) {
 				diff_refresh = d;
 				best = cmode;

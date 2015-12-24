@@ -1999,9 +1999,30 @@ static void mxc_hdmi_create_modelist(struct mxc_hdmi *hdmi, int from_edid)
 		if (fb_add_videomode(&mode, &hdmi->fbi->modelist))
 			continue;
 
-		dev_dbg(&hdmi->pdev->dev, "Added mode: %d, vic: %d", i, vic);
 		dev_dbg(&hdmi->pdev->dev,
-			"xres = %d, yres = %d, scan = %c, ratio = %s, freq = %d, vmode = %d, flag = %d\n",
+			"Mode: vic=%d, xres=%d, yres=%d, scan=%c, ratio=%s, freq=%d, vmode=%d, flag=%d\n",
+			vic,
+			mode.xres,
+			mode.yres,
+			mode.vmode & FB_VMODE_INTERLACED ? 'i' : 'p',
+			mode.vmode & FB_VMODE_ASPECT_4_3 ? "4/3" :
+			    mode.vmode & FB_VMODE_ASPECT_16_9 ? "16/9" : "n/a",
+			mode.refresh,
+			mode.vmode,
+			mode.flag);
+
+		/* check if fractional mode should be inserted */
+		if (vic == 0 || !(mode.refresh == 24 || (mode.refresh % 30) == 0))
+			continue;
+
+		mode.refresh--;
+		mode.vmode |= FB_VMODE_FRACTIONAL;
+		if (fb_add_videomode(&mode, &hdmi->fbi->modelist))
+			continue;
+
+		dev_dbg(&hdmi->pdev->dev,
+			"Mode: vic=%d, xres=%d, yres=%d, scan=%c, ratio=%s, freq=%d, vmode=%d, flag=%d\n",
+			vic,
 			mode.xres,
 			mode.yres,
 			mode.vmode & FB_VMODE_INTERLACED ? 'i' : 'p',
