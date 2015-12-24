@@ -441,8 +441,8 @@ static bool hdmi_compute_cts_n(unsigned int freq, unsigned long pixel_clk,
 static void hdmi_lookup_cts_n(unsigned int freq, unsigned long pixel_clk,
 				   unsigned int *n, unsigned int *cts)
 {
-	unsigned int clk = pixel_clk / 1000;
-	unsigned int frq = freq;
+	int clk = pixel_clk / 1000;
+	int frq = freq;
 	int i, j;
 
 	*n = 1;
@@ -468,7 +468,7 @@ static void hdmi_lookup_cts_n(unsigned int freq, unsigned long pixel_clk,
 	}
 
 	for (i = 0; i < ARRAY_SIZE(mxc_hdmi_ctsn_tbl); i++) {
-		if (mxc_hdmi_ctsn_tbl[i].pixclk == clk) {
+		if (abs(mxc_hdmi_ctsn_tbl[i].pixclk - clk) <= 1) {
 			for (j = 0; j < 3; j++) {
 				if (mxc_hdmi_ctsn_tbl[i].ctsn[j].freq == frq) {
 					*n *= mxc_hdmi_ctsn_tbl[i].ctsn[j].n;
