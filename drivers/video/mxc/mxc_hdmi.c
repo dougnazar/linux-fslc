@@ -1949,7 +1949,7 @@ static void mxc_hdmi_notify_fb(struct mxc_hdmi *hdmi, bool force_all)
 static void mxc_hdmi_create_modelist(struct mxc_hdmi *hdmi, int from_edid)
 {
 	struct fb_videomode mode;
-	int i, vic, mode_count = ARRAY_SIZE(mxc_cea_mode);
+	int i, j, skip, vic, mode_count = ARRAY_SIZE(mxc_cea_mode);
 	const struct fb_videomode *mode_data = mxc_cea_mode;
 
 	if (from_edid) {
@@ -1974,6 +1974,19 @@ static void mxc_hdmi_create_modelist(struct mxc_hdmi *hdmi, int from_edid)
 			continue;
 
 		mode = mode_data[i];
+
+		/* for dual aspect ratio modes, insert the first one only */
+		if (mode.vmode & FB_VMODE_ASPECT_MASK) {
+			skip = 0;
+			for (j = i - 1; !skip && j >= 0; j--) {
+				skip = mode.xres == mode_data[j].xres &&
+				       mode.yres == mode_data[j].yres &&
+				       mode.refresh == mode_data[j].refresh &&
+				       (mode.vmode ^ FB_VMODE_ASPECT_MASK) == mode_data[j].vmode;
+			}
+			if (skip)
+				continue;
+		}
 
 		/* TODO: Discuss if we should always set default modes as standard */
 		if (!from_edid /*&& ignore_edid*/)
