@@ -100,8 +100,8 @@ struct mxc_edid_cfg {
 };
 
 static inline unsigned long mxcPICOS2KHZ(u32 pixclock, u32 vmode) {
-	u32 x = (1000000000UL / (pixclock) * 1000 / ((vmode & FB_VMODE_FRACTIONAL) ? 1001 : 1000));
-	return x + ((1000000000UL % x) > (x / 2) ? 1 : 0);
+	return ((((vmode & FB_VMODE_FRACTIONAL) ?
+			(999000999UL*4) : (1000000000UL*4)) / pixclock) + 1) >> 2;
 }
 
 int mxc_edid_var_to_vic(struct fb_var_screeninfo *var);

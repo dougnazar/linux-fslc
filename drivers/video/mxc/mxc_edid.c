@@ -38,20 +38,25 @@
 #define DPRINTK(fmt, args...)
 #endif
 
+/*
+ * Attention:	pixel times for the fractional mode entries must
+ *		specify the non-fractional frequency of that mode!
+ *		I.e. 60Hz instead of 59.94 and 24Hz instead of 23.98.
+ */
 const struct fb_videomode mxc_cea_mode[64] = {
 	/* #1: 640x480p@59.94/60Hz 4:3 */
 	[1] = {
-		NULL, 60, 640, 480, 39722, 48, 16, 33, 10, 96, 2, 0,
+		NULL, 60, 640, 480, 39682, 48, 16, 33, 10, 96, 2, 0,
 		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, 0,
 	},
 	/* #2: 720x480p@59.94/60Hz 4:3 */
 	[2] = {
-		NULL, 60, 720, 480, 37037, 60, 16, 30, 9, 62, 6, 0,
+		NULL, 60, 720, 480, 37000, 60, 16, 30, 9, 62, 6, 0,
 		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, 0,
 	},
 	/* #3: 720x480p@59.94/60Hz 16:9 */
 	[3] = {
-		NULL, 60, 720, 480, 37037, 60, 16, 30, 9, 62, 6, 0,
+		NULL, 60, 720, 480, 37000, 60, 16, 30, 9, 62, 6, 0,
 		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9, 0,
 	},
 	/* #4: 1280x720p@59.94/60Hz 16:9 */
@@ -68,22 +73,22 @@ const struct fb_videomode mxc_cea_mode[64] = {
 	},
 	/* #6: 720(1440)x480iH@59.94/60Hz 4:3 */
 	[6] = {
-		NULL, 60, 1440, 480, 37037, 38, 114, 8, 31, 124, 6, 0,
+		NULL, 60, 1440, 480, 37000, 38, 114, 8, 31, 124, 6, 0,
 		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_4_3, 0,
 	},
 	/* #7: 720(1440)x480iH@59.94/60Hz 16:9 */
 	[7] = {
-		NULL, 60, 1440, 480, 37037, 38, 114, 8, 31, 124, 6, 0,
+		NULL, 60, 1440, 480, 37000, 38, 114, 8, 31, 124, 6, 0,
 		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_16_9, 0,
 	},
 	/* #8: 720(1440)x240pH@59.94/60Hz 4:3 */
 	[8] = {
-		NULL, 60, 1440, 240, 37108, 114, 38, 15, 4, 124, 3, 0,
+		NULL, 60, 1440, 240, 37000, 114, 38, 15, 4, 124, 3, 0,
 		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, 0,
 	},
 	/* #9: 720(1440)x240pH@59.94/60Hz 16:9 */
 	[9] = {
-		NULL, 60, 1440, 240, 37108, 114, 38, 15, 4, 124, 3, 0,
+		NULL, 60, 1440, 240, 37000, 114, 38, 15, 4, 124, 3, 0,
 		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9, 0,
 	},
 	/* #14: 1440x480p@59.94/60Hz 4:3 */
