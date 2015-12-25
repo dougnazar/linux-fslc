@@ -216,7 +216,7 @@ EXPORT_SYMBOL(mxc_fb_mode_is_equal_res);
  * pixclock, since for many CEA modes, 2 frequencies are supported
  * e.g. 640x480 @ 60Hz or 59.94Hz
  */
-int mxc_edid_fb_mode_is_equal(bool use_aspect,
+static int mxc_edid_fb_mode_is_equal(bool use_aspect,
 			const struct fb_videomode *mode1,
 			const struct fb_videomode *mode2)
 {
@@ -741,24 +741,6 @@ static int mxc_edid_readsegblk(struct i2c_adapter *adp, unsigned short addr,
 	return ret;
 }
 
-int mxc_edid_var_to_vic(struct fb_var_screeninfo *var)
-{
-	int i;
-	struct fb_videomode m;
-
-	for (i = 0; i < ARRAY_SIZE(mxc_cea_mode); i++) {
-		fb_var_to_videomode(&m, var);
-		if (mxc_edid_fb_mode_is_equal(false, &m, &mxc_cea_mode[i]))
-			break;
-	}
-
-	if (i == ARRAY_SIZE(mxc_cea_mode))
-		return 0;
-
-	return i;
-}
-EXPORT_SYMBOL(mxc_edid_var_to_vic);
-
 int mxc_edid_mode_to_vic(const struct fb_videomode *mode)
 {
 	int i;
@@ -766,13 +748,10 @@ int mxc_edid_mode_to_vic(const struct fb_videomode *mode)
 
 	for (i = 0; i < ARRAY_SIZE(mxc_cea_mode); i++) {
 		if (mxc_edid_fb_mode_is_equal(use_aspect, mode, &mxc_cea_mode[i]))
-			break;
+			return i;
 	}
 
-	if (i == ARRAY_SIZE(mxc_cea_mode))
-		return 0;
-
-	return i;
+	return 0;
 }
 EXPORT_SYMBOL(mxc_edid_mode_to_vic);
 

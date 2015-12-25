@@ -104,7 +104,6 @@ static inline unsigned long mxcPICOS2KHZ(u32 pixclock, u32 vmode) {
 			(999000999UL*4) : (1000000000UL*4)) / pixclock) + 1) >> 2;
 }
 
-int mxc_edid_var_to_vic(struct fb_var_screeninfo *var);
 int mxc_edid_mode_to_vic(const struct fb_videomode *mode);
 int mxc_edid_read(struct i2c_adapter *adp, unsigned short addr,
 	unsigned char *edid, struct mxc_edid_cfg *cfg, struct fb_info *fbi);
