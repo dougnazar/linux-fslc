@@ -800,52 +800,51 @@ int mxc_edid_read(struct i2c_adapter *adp, unsigned short addr,
 EXPORT_SYMBOL(mxc_edid_read);
 
 const struct fb_videomode *mxc_fb_find_nearest_mode(const struct fb_videomode *mode,
-						    struct list_head *head, bool relax)
+					  struct list_head *head)
 {
 	struct list_head *pos;
 	struct fb_modelist *modelist;
 	struct fb_videomode *cmode;
-	static struct fb_videomode *best;
-	static u32 diff, diff_refresh;
-	u32 mask = relax ? ~FB_VMODE_ASPECT_MASK : ~0;
-	int refresh = mode->refresh;
+	struct fb_videomode *best = NULL;
+	u32 d, diff = ~0, diff_refresh = ~0;
+	int i, refresh = mode->refresh;
+	static const u32 masks[] = {
+		~(FB_VMODE_FRACTIONAL),
+		~(FB_VMODE_FRACTIONAL | FB_VMODE_ASPECT_MASK),
+		~(FB_VMODE_FRACTIONAL | FB_VMODE_INTERLACED),
+		~(FB_VMODE_FRACTIONAL | FB_VMODE_INTERLACED | FB_VMODE_ASPECT_MASK)
+	};
 
 	if ((mode->flag & FB_MODE_IS_FROM_VAR) &&
 	    (mode->vmode & FB_VMODE_FRACTIONAL))
 		refresh--;
 
-	if (!relax) {
-		diff = -1;
-		diff_refresh = -1;
-		best = NULL;
-	}
+	for (i = 0; i < ARRAY_SIZE(masks); i++) {
+		list_for_each(pos, head) {
+			modelist = list_entry(pos, struct fb_modelist, list);
+			cmode = &modelist->mode;
 
-	list_for_each(pos, head) {
-		u32 d;
+			if ((mode->vmode ^ cmode->vmode) & masks[i])
+					continue;
 
-		modelist = list_entry(pos, struct fb_modelist, list);
-		cmode = &modelist->mode;
-
-		if ((mode->vmode ^ cmode->vmode) & mask)
-				continue;
-
-		d = abs(cmode->xres - mode->xres) +
-			abs(cmode->yres - mode->yres);
-		if (diff > d) {
-			diff = d;
-			diff_refresh = abs(cmode->refresh - refresh);
-			best = cmode;
-		} else if (diff == d) {
-			d = abs(cmode->refresh - refresh);
-			if (diff_refresh > d) {
-				diff_refresh = d;
+			d = abs(cmode->xres - mode->xres) +
+				abs(cmode->yres - mode->yres);
+			if (diff > d) {
+				diff = d;
+				diff_refresh = abs(cmode->refresh - refresh);
 				best = cmode;
+			} else if (diff == d) {
+				d = abs(cmode->refresh - refresh);
+				if (diff_refresh > d) {
+					diff_refresh = d;
+					best = cmode;
+				}
 			}
 		}
-	}
 
-	if ((!relax && (diff_refresh || diff)) || !best)
-		mxc_fb_find_nearest_mode(mode, head, true);
+		if (diff_refresh == 0 && diff == 0)
+			break;
+	}
 
 	return best;
 }
