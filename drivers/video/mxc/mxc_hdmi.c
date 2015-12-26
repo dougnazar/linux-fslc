@@ -1418,21 +1418,17 @@ static void hdmi_config_AVI(struct mxc_hdmi *hdmi)
 	u8 under_scan;
 	u8 act_ratio, coded_ratio, colorimetry, ext_colorimetry;
 	struct fb_videomode mode;
-	const struct fb_videomode *edid_mode;
-	bool aspect_16_9;
 
 	dev_dbg(&hdmi->pdev->dev, "set up AVI frame\n");
 
 	fb_var_to_videomode(&mode, &hdmi->fbi->var);
-	/* Use mode from list extracted from EDID to get aspect ratio */
-	if (!list_empty(&hdmi->fbi->modelist)) {
-		edid_mode = fb_find_nearest_mode(&mode, &hdmi->fbi->modelist);
-		if (edid_mode->vmode & FB_VMODE_ASPECT_16_9)
-			aspect_16_9 = true;
+
+	if (!(mode.vmode & FB_VMODE_ASPECT_MASK)) {
+		if( mode.xres <= (mode.yres / 3) * 4)
+			mode.vmode |= FB_VMODE_ASPECT_4_3;
 		else
-			aspect_16_9 = false;
-	} else
-		aspect_16_9 = false;
+			mode.vmode |= FB_VMODE_ASPECT_16_9;
+	}
 
 	/********************************************
 	 * AVI Data Byte 1
@@ -1464,7 +1460,7 @@ static void hdmi_config_AVI(struct mxc_hdmi *hdmi)
 	 ********************************************/
 
 	/*  Set the Aspect Ratio */
-	if (aspect_16_9) {
+	if (mode.vmode & FB_VMODE_ASPECT_16_9) {
 		act_ratio = HDMI_FC_AVICONF1_ACTIVE_ASPECT_RATIO_16_9;
 		coded_ratio = HDMI_FC_AVICONF1_CODED_ASPECT_RATIO_16_9;
 	} else {
