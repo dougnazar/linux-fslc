@@ -2074,23 +2074,24 @@ static void mxc_hdmi_set_mode(struct mxc_hdmi *hdmi, int edid_status)
 	dump_fb_videomode(&m);
 	mode = mxc_fb_find_nearest_mode(&m, &hdmi->fbi->modelist);
 
-	if (mode) {
-		hdmi->fbi->mode = (struct fb_videomode *)mode;
-		fb_videomode_to_var(&hdmi->fbi->var, mode);
-	} else {
+	if (!mode) {
 		pr_err("%s: could not find mode in modelist\n", __func__);
 		return;
 	}
 
+	hdmi->fbi->mode = (struct fb_videomode *)mode;
+	fb_videomode_to_var(&hdmi->fbi->var, mode);
+
 	/* restore xBuffer if dimension match */
-	if ((edid_status == HDMI_EDID_SAME && fb_mode_is_equal(&hdmi->previous_non_vga_mode, mode)) ||
-	    (edid_status != HDMI_EDID_SAME && mxc_fb_mode_is_equal_res(&hdmi->previous_non_vga_mode, mode))) {
+	if (hdmi->previous_non_vga_mode.xres == mode->xres &&
+	    hdmi->previous_non_vga_mode.yres == mode->yres) {
 		dev_dbg(&hdmi->pdev->dev,
-				"%s: Video mode %ssame as previous\n", __func__, edid_status == HDMI_EDID_SAME ? "+ EDID " : "");
+			"%s: Resolution %ssame as previous\n",
+			__func__, edid_status == HDMI_EDID_SAME ? "+ EDID " : "");
 		if (hdmi->prev_virtual.xres_virtual)
 			memcpy(&hdmi->fbi->var.xres_virtual, &hdmi->prev_virtual, sizeof(hdmi->prev_virtual));
 	} else {
-		dev_dbg(&hdmi->pdev->dev, "%s: New video mode\n", __func__);
+		dev_dbg(&hdmi->pdev->dev, "%s: Resolution changed\n", __func__);
 		new_screen = true;
 	}
 
@@ -2377,6 +2378,7 @@ static void mxc_hdmi_setup(struct mxc_hdmi *hdmi, unsigned long event)
 			memcpy(&hdmi->prev_virtual, &hdmi->fbi->var.xres_virtual, sizeof(hdmi->prev_virtual));
 		else
 			memset(&hdmi->prev_virtual, 0, sizeof(hdmi->prev_virtual));
+
 		if (!list_empty(&hdmi->fbi->modelist)) {
 			edid_mode = mxc_fb_find_nearest_mode(&m, &hdmi->fbi->modelist);
 			pr_debug("edid mode ");
