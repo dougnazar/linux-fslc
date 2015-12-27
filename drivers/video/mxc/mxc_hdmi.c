@@ -2406,17 +2406,29 @@ static void mxc_hdmi_setup(struct mxc_hdmi *hdmi, unsigned long event)
 	else
 		hdmi->hdmi_data.colorimetry = eITU709;
 
-	if ((hdmi->vic == 10) || (hdmi->vic == 11) ||
-		(hdmi->vic == 12) || (hdmi->vic == 13) ||
-		(hdmi->vic == 14) || (hdmi->vic == 15) ||
-		(hdmi->vic == 25) || (hdmi->vic == 26) ||
-		(hdmi->vic == 27) || (hdmi->vic == 28) ||
-		(hdmi->vic == 29) || (hdmi->vic == 30) ||
-		(hdmi->vic == 35) || (hdmi->vic == 36) ||
-		(hdmi->vic == 37) || (hdmi->vic == 38))
+	if ((hdmi->vic >= 6 && hdmi->vic <= 9) ||
+		(hdmi->vic >= 21 && hdmi->vic <= 24) ||
+		(hdmi->vic >= 44 && hdmi->vic <= 45) ||
+		(hdmi->vic >= 50 && hdmi->vic <= 51) ||
+		(hdmi->vic >= 55 && hdmi->vic <= 56) ||
+		(hdmi->vic >= 58 && hdmi->vic <= 59) ) {
+		/* These formats require a pixel repetition factor of 2 */
 		hdmi->hdmi_data.video_mode.mPixelRepetitionOutput = 1;
-	else
+	} else if ((hdmi->vic >= 14 && hdmi->vic <= 15) ||
+		(hdmi->vic >= 29 && hdmi->vic <= 30) ) {
+		/* These formats may be used with repetition factors 1 or 2 */
+		/* We use 1 to select picture a width of 1440 (vs. 720) */
 		hdmi->hdmi_data.video_mode.mPixelRepetitionOutput = 0;
+	} else if ((hdmi->vic >= 10 && hdmi->vic <= 13) ||
+		(hdmi->vic >= 25 && hdmi->vic <= 28) ||
+		(hdmi->vic >= 35 && hdmi->vic <= 38)) {
+		/* These formats may be used with multiple repetition factors */
+		/* The width for factor == 1 is 2880 (currently unsupported) */
+		hdmi->hdmi_data.video_mode.mPixelRepetitionOutput = 3;
+	} else {
+		/* No repetition (i.e. factor 1) */
+		hdmi->hdmi_data.video_mode.mPixelRepetitionOutput = 0;
+	}
 
 	hdmi->hdmi_data.video_mode.mPixelRepetitionInput = 0;
 
