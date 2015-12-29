@@ -49,6 +49,7 @@
 #include <linux/string.h>
 #include <linux/uaccess.h>
 
+#include <video/mxc_edid.h>
 #include "mxc_dispdrv.h"
 
 /*
@@ -643,11 +644,11 @@ static int mxcfb_set_par(struct fb_info *fbi)
 		if (fbi->var.sync & FB_SYNC_CLK_IDLE_EN)
 			sig_cfg.clkidle_en = true;
 
-		dev_dbg(fbi->device, "pixclock = %ul Hz\n",
-			(u32) (PICOS2KHZ(fbi->var.pixclock) * 1000UL));
+		dev_dbg(fbi->device, "pixclock = %lu Hz\n",
+			mxcPICOS2KHZ(fbi->var.pixclock, fbi->var.vmode) * 1000UL);
 
 		if (ipu_init_sync_panel(mxc_fbi->ipu, mxc_fbi->ipu_di,
-					(PICOS2KHZ(fbi->var.pixclock)) * 1000UL,
+					(mxcPICOS2KHZ(fbi->var.pixclock, fbi->var.vmode)) * 1000UL,
 					fbi->var.xres, fbi->var.yres,
 					out_pixel_fmt,
 					fbi->var.left_margin,
