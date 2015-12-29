@@ -31,6 +31,7 @@
 #define FB_VMODE_ASPECT_4_3	0x10
 #define FB_VMODE_ASPECT_16_9	0x20
 #define FB_VMODE_ASPECT_MASK	(FB_VMODE_ASPECT_4_3 | FB_VMODE_ASPECT_16_9)
+#define FB_VMODE_DBLCLK	0x40
 
 enum cea_audio_coding_types {
 	AUDIO_CODING_TYPE_REF_STREAM_HEADER	=  0,
@@ -111,4 +112,5 @@ int mxc_edid_parse_ext_blk(unsigned char *edid, struct mxc_edid_cfg *cfg,
 	struct fb_monspecs *specs);
 const struct fb_videomode *mxc_fb_find_nearest_mode(const struct fb_videomode *mode,
 						struct list_head *head);
+void mxc_fb_var_to_videomode(struct fb_videomode *mode, const struct fb_var_screeninfo *var);
 #endif

@@ -1421,7 +1421,7 @@ static void hdmi_config_AVI(struct mxc_hdmi *hdmi)
 
 	dev_dbg(&hdmi->pdev->dev, "set up AVI frame\n");
 
-	fb_var_to_videomode(&mode, &hdmi->fbi->var);
+	mxc_fb_var_to_videomode(&mode, &hdmi->fbi->var);
 
 	if (!(mode.vmode & FB_VMODE_ASPECT_MASK)) {
 		if( mode.xres <= (mode.yres / 3) * 4)
@@ -1548,7 +1548,7 @@ static void hdmi_av_composer(struct mxc_hdmi *hdmi)
 
 	dev_dbg(&hdmi->pdev->dev, "%s\n", __func__);
 
-	fb_var_to_videomode(&fb_mode, &fbi->var);
+	mxc_fb_var_to_videomode(&fb_mode, &fbi->var);
 
 	vmode->mHSyncPolarity = ((fb_mode.sync & FB_SYNC_HOR_HIGH_ACT) != 0);
 	vmode->mVSyncPolarity = ((fb_mode.sync & FB_SYNC_VERT_HIGH_ACT) != 0);
@@ -1971,6 +1971,10 @@ static void mxc_hdmi_create_modelist(struct mxc_hdmi *hdmi, int from_edid)
 
 		mode = mode_data[i];
 
+		/* TODO: double clocking currently not implemented in IPU */
+		if (mode.vmode & FB_VMODE_DBLCLK)
+			continue;
+
 		/* for dual aspect ratio modes, insert the first one only */
 		if (mode.vmode & FB_VMODE_ASPECT_MASK) {
 			skip = 0;
@@ -2066,7 +2070,7 @@ static void mxc_hdmi_set_mode(struct mxc_hdmi *hdmi, int edid_status)
 			fb_videomode_to_var(&var, mode);
 	}
 
-	fb_var_to_videomode(&m, &var);
+	mxc_fb_var_to_videomode(&m, &var);
 	dump_fb_videomode(&m);
 	mode = mxc_fb_find_nearest_mode(&m, &hdmi->fbi->modelist);
 
@@ -2358,7 +2362,7 @@ static void mxc_hdmi_setup(struct mxc_hdmi *hdmi, unsigned long event)
 
 	dev_dbg(&hdmi->pdev->dev, "%s\n", __func__);
 
-	fb_var_to_videomode(&m, &hdmi->fbi->var);
+	mxc_fb_var_to_videomode(&m, &hdmi->fbi->var);
 	dump_fb_videomode(&m);
 
 	dev_dbg(&hdmi->pdev->dev, "%s - video mode changed\n", __func__);
@@ -2831,7 +2835,7 @@ static int mxc_hdmi_disp_init(struct mxc_dispdrv_handle *disp,
 	fb_find_mode(&hdmi->fbi->var, hdmi->fbi,
 		     hdmi->dft_mode_str, NULL, 0,
 		     &vga_mode, hdmi->default_bpp);
-	fb_var_to_videomode(&m, &hdmi->fbi->var);
+	mxc_fb_var_to_videomode(&m, &hdmi->fbi->var);
 	if (m.vmode & FB_VMODE_INTERLACED)
 		m.refresh = (m.refresh / 2) - 2;
 	hdmi->dft_mode_set = false;

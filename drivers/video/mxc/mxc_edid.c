@@ -73,23 +73,23 @@ const struct fb_videomode mxc_cea_mode[64] = {
 	},
 	/* #6: 720(1440)x480iH@59.94/60Hz 4:3 */
 	[6] = {
-		NULL, 60, 1440, 480, 37000, 38, 114, 8, 31, 124, 6, 0,
-		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_4_3, 0,
+		NULL, 60, 720, 480, 37000, 38, 114, 8, 31, 124, 6, 0,
+		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_4_3 | FB_VMODE_DBLCLK, 0,
 	},
 	/* #7: 720(1440)x480iH@59.94/60Hz 16:9 */
 	[7] = {
-		NULL, 60, 1440, 480, 37000, 38, 114, 8, 31, 124, 6, 0,
-		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_16_9, 0,
+		NULL, 60, 720, 480, 37000, 38, 114, 8, 31, 124, 6, 0,
+		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_16_9 | FB_VMODE_DBLCLK, 0,
 	},
 	/* #8: 720(1440)x240pH@59.94/60Hz 4:3 */
 	[8] = {
-		NULL, 60, 1440, 240, 37000, 114, 38, 15, 4, 124, 3, 0,
-		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, 0,
+		NULL, 60, 720, 240, 37000, 114, 38, 15, 4, 124, 3, 0,
+		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3 | FB_VMODE_DBLCLK, 0,
 	},
 	/* #9: 720(1440)x240pH@59.94/60Hz 16:9 */
 	[9] = {
-		NULL, 60, 1440, 240, 37000, 114, 38, 15, 4, 124, 3, 0,
-		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9, 0,
+		NULL, 60, 720, 240, 37000, 114, 38, 15, 4, 124, 3, 0,
+		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9 | FB_VMODE_DBLCLK, 0,
 	},
 	/* #14: 1440x480p@59.94/60Hz 4:3 */
 	[14] = {
@@ -131,30 +131,30 @@ const struct fb_videomode mxc_cea_mode[64] = {
 	},
 	/* #21: 720(1440)x576i@50Hz */
 	[21] = {
-		NULL, 50, 1440, 576, 37037, 24, 138, 4, 39, 126, 6, 0,
-		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_4_3, 0,
+		NULL, 50, 720, 576, 37037, 24, 138, 4, 39, 126, 6, 0,
+		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_4_3 | FB_VMODE_DBLCLK, 0,
 	},
 	/* #22: 720(1440)x576i@50Hz */
 	[22] = {
-		NULL, 50, 1440, 576, 37037, 24, 138, 4, 39, 126, 6, 0,
-		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_16_9, 0,
+		NULL, 50, 720, 576, 37037, 24, 138, 4, 39, 126, 6, 0,
+		FB_VMODE_INTERLACED | FB_VMODE_ASPECT_16_9 | FB_VMODE_DBLCLK, 0,
 	},
 	/* #23: 720(1440)x288pH@50Hz 4:3 */
 	[23] = {
-		NULL, 50, 1440, 288, 37037, 138, 24, 19, 2, 126, 3, 0,
-		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, 0,
+		NULL, 50, 720, 288, 37037, 138, 24, 19, 2, 126, 3, 0,
+		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3 | FB_VMODE_DBLCLK, 0,
 	},
 	/* #24: 720(1440)x288pH@50Hz 16:9 */
 	[24] = {
-		NULL, 50, 1440, 288, 37037, 138, 24, 19, 2, 126, 3, 0,
-		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9, 0,
+		NULL, 50, 720, 288, 37037, 138, 24, 19, 2, 126, 3, 0,
+		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9 | FB_VMODE_DBLCLK, 0,
 	},
-	/* #29: 720(1440)x576pH@50Hz 4:3 */
+	/* #29: 1440x576p@50Hz 4:3 */
 	[29] = {
 		NULL, 50, 1440, 576, 18518, 136, 24, 39, 5, 128, 5, 0,
 		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, 0,
 	},
-	/* #30: 720(1440)x576pH@50Hz 16:9 */
+	/* #30: 1440x576p@50Hz 16:9 */
 	[30] = {
 		NULL, 50, 1440, 576, 18518, 136, 24, 39, 5, 128, 5, 0,
 		FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9, 0,
@@ -210,9 +210,9 @@ static int mxc_edid_fb_mode_is_equal(bool use_aspect,
 	u32 mask;
 
 	if (use_aspect)
-		mask = ~FB_VMODE_FRACTIONAL;
+		mask = ~(FB_VMODE_FRACTIONAL | FB_VMODE_DBLCLK);
 	else
-		mask = ~(FB_VMODE_FRACTIONAL | FB_VMODE_ASPECT_MASK);
+		mask = ~(FB_VMODE_FRACTIONAL | FB_VMODE_DBLCLK | FB_VMODE_ASPECT_MASK);
 
 	return (mode1->xres         == mode2->xres &&
 		mode1->yres         == mode2->yres &&
@@ -796,15 +796,11 @@ const struct fb_videomode *mxc_fb_find_nearest_mode(const struct fb_videomode *m
 	u32 d, diff = ~0, diff_refresh = ~0;
 	int i, refresh = mode->refresh;
 	static const u32 masks[] = {
-		~(FB_VMODE_FRACTIONAL),
-		~(FB_VMODE_FRACTIONAL | FB_VMODE_ASPECT_MASK),
-		~(FB_VMODE_FRACTIONAL | FB_VMODE_INTERLACED),
-		~(FB_VMODE_FRACTIONAL | FB_VMODE_INTERLACED | FB_VMODE_ASPECT_MASK)
+		~(FB_VMODE_FRACTIONAL | FB_VMODE_DBLCLK),
+		~(FB_VMODE_FRACTIONAL | FB_VMODE_DBLCLK | FB_VMODE_ASPECT_MASK),
+		~(FB_VMODE_FRACTIONAL | FB_VMODE_DBLCLK | FB_VMODE_INTERLACED),
+		~(FB_VMODE_FRACTIONAL | FB_VMODE_DBLCLK | FB_VMODE_INTERLACED | FB_VMODE_ASPECT_MASK)
 	};
-
-	if ((mode->flag & FB_MODE_IS_FROM_VAR) &&
-	    (mode->vmode & FB_VMODE_FRACTIONAL))
-		refresh--;
 
 	for (i = 0; i < ARRAY_SIZE(masks); i++) {
 		list_for_each(pos, head) {
@@ -837,3 +833,44 @@ const struct fb_videomode *mxc_fb_find_nearest_mode(const struct fb_videomode *m
 }
 EXPORT_SYMBOL(mxc_fb_find_nearest_mode);
 
+void mxc_fb_var_to_videomode(struct fb_videomode *mode, const struct fb_var_screeninfo *var)
+{
+	u32 pixclock, hfreq, htotal, vtotal;
+
+	mode->name = NULL;
+	mode->xres = var->xres;
+	mode->yres = var->yres;
+	mode->pixclock = var->pixclock;
+	mode->hsync_len = var->hsync_len;
+	mode->vsync_len = var->vsync_len;
+	mode->left_margin = var->left_margin;
+	mode->right_margin = var->right_margin;
+	mode->upper_margin = var->upper_margin;
+	mode->lower_margin = var->lower_margin;
+	mode->sync = var->sync;
+	mode->vmode = var->vmode & FB_VMODE_MASK;
+	mode->flag = FB_MODE_IS_FROM_VAR;
+	mode->refresh = 0;
+
+	if (!var->pixclock)
+		return;
+
+	/* Note: mxcPICOS2KHZ() is not used here by purpose */
+	pixclock = PICOS2KHZ(var->pixclock) * 1000;
+
+	htotal = var->xres + var->right_margin + var->hsync_len +
+		var->left_margin;
+	vtotal = var->yres + var->lower_margin + var->vsync_len +
+		var->upper_margin;
+
+	if (var->vmode & FB_VMODE_DBLCLK)
+		htotal += var->xres;
+	if (var->vmode & FB_VMODE_INTERLACED)
+		vtotal /= 2;
+	if (var->vmode & FB_VMODE_DOUBLE)
+		vtotal *= 2;
+
+	hfreq = pixclock/htotal;
+	mode->refresh = hfreq/vtotal - ((var->vmode & FB_VMODE_FRACTIONAL) ? 1 : 0);
+}
+EXPORT_SYMBOL(mxc_fb_var_to_videomode);
