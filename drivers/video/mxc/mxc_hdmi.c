@@ -95,7 +95,7 @@
  * in HDMI Initialization Step B
  */
 static const struct fb_videomode vga_mode = {
-	/* 640x480 @ 60 Hz, 31.5 kHz hsync */
+	/* 640x480 @ 59.94 Hz, 31.5 kHz hsync */
 	NULL, 60, 640, 480, 39721, 48, 16, 33, 10, 96, 2, 0,
 	FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, FB_MODE_IS_VESA,
 };
@@ -1987,6 +1987,10 @@ static void mxc_hdmi_create_modelist(struct mxc_hdmi *hdmi, int from_edid)
 			if (skip)
 				continue;
 		}
+
+		/* Skip standard VGA (already present) */
+		if (vic == 1 && (mode.flag & FB_MODE_IS_VESA))
+			continue;
 
 		/* TODO: Discuss if we should always set default modes as standard */
 		if (!from_edid /*&& ignore_edid*/)
