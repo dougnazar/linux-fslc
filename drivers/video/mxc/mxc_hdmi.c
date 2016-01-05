@@ -2819,13 +2819,15 @@ static int mxc_hdmi_disp_init(struct mxc_dispdrv_handle *disp,
 
 	/* Set the default mode when disp init. */
 	fb_find_mode(&hdmi->fbi->var, hdmi->fbi,
-		     hdmi->dft_mode_str, NULL, 0, NULL,
-		     hdmi->default_bpp);
+		     hdmi->dft_mode_str, NULL, 0,
+		     &vga_mode, hdmi->default_bpp);
 	fb_var_to_videomode(&m, &hdmi->fbi->var);
+	if (m.vmode & FB_VMODE_INTERLACED)
+		m.refresh = (m.refresh / 2) - 2;
 	hdmi->dft_mode_set = false;
 
 	/* Find a nearest mode in default modelist */
-	mode = fb_find_nearest_mode(&m, &hdmi->fbi->modelist);
+	mode = mxc_fb_find_nearest_mode(&m, &hdmi->fbi->modelist);
 	if (!mode) {
 		pr_err("%s: could not find mode in modelist\n", __func__);
 		return -1;
